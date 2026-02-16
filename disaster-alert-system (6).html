@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Disaster Alert System - Smart Apartment Safety</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      color: #667eea;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-icon {
+      font-size: 32px;
+    }
+
+    .user-info {
+      text-align: right;
+    }
+
+    .user-info .role {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .user-info .name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      max-width: 500px;
+      margin: 100px auto;
+    }
+
+    .login-container h2 {
+      color: #667eea;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .login-options {
+      display: grid;
+      gap: 15px;
+    }
+
+    .login-btn {
+      padding: 15px 25px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .login-btn.flat-owner {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .login-btn.control-room {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .flat-selector {
+      margin-top: 20px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .flat-selector label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .flat-selector select,
+    .flat-selector input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    .flat-selector select {
+      cursor: pointer;
+    }
+
+    .flat-selector button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .flat-selector button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .error-message {
+      color: #f5576c;
+      font-size: 14px;
+      margin-top: 10px;
+      font-weight: 600;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .sensor-card {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sensor-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .sensor-card.alert {
+      animation: pulse 1.5s infinite;
+      border: 3px solid #f5576c;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 5px 20px rgba(245, 87, 108, 0.3); }
+      50% { box-shadow: 0 5px 30px rgba(245, 87, 108, 0.6); }
+    }
+
+    .sensor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .sensor-icon {
+      font-size: 36px;
+    }
+
+    .sensor-status {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .sensor-status.safe {
+      background: #10b981;
+      color: white;
+    }
+
+    .sensor-status.danger {
+      background: #f5576c;
+      color: white;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0.5; }
+    }
+
+    .sensor-name {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .sensor-reading {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .sensor-reading.danger {
+      color: #f5576c;
+    }
+
+    .sensor-limit {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+
+    .sensor-limit strong {
+      color: #333;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+
+    .progress-fill.safe {
+      background: linear-gradient(90deg, #10b981, #34d399);
+    }
+
+    .progress-fill.danger {
+      background: linear-gradient(90deg, #f5576c, #ff6b81);
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .flat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .flat-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .flat-card.alert {
+      background: #fee;
+      border: 2px solid #f5576c;
+      animation: shake 0.5s infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .flat-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .flat-card.alert .flat-number {
+      color: #f5576c;
+    }
+
+    .flat-status {
+      font-size: 14px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: inline-block;
+    }
+
+    .flat-status.safe {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .flat-status.danger {
+      background: #fee;
+      color: #991b1b;
+      font-weight: bold;
+    }
+
+    .alert-panel {
+      background: white;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+
+    .alert-panel h2 {
+      color: #333;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .alert-item {
+      background: #fee;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border-left: 4px solid #f5576c;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .alert-item .time {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f5576c;
+      color: white;
+      padding: 20px 25px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 1000;
+      animation: slideIn 0.3s, shake 0.5s 0.3s 3;
+      min-width: 300px;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification-header {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notification-body {
+      font-size: 14px;
+    }
+
+    .buzzer {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(245, 87, 108, 0.95);
+      color: white;
+      padding: 50px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      z-index: 2000;
+      text-align: center;
+      animation: buzzScale 0.5s infinite;
+    }
+
+    @keyframes buzzScale {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    .buzzer-icon {
+      font-size: 80px;
+      margin-bottom: 20px;
+      animation: rotate 2s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .buzzer h2 {
+      font-size: 36px;
+      margin-bottom: 15px;
+    }
+
+    .buzzer p {
+      font-size: 18px;
+      margin-bottom: 25px;
+    }
+
+    .buzzer button {
+      background: white;
+      color: #f5576c;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .buzzer button:hover {
+      transform: scale(1.05);
+    }
+
+    .logout-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+    }
+
+    .floor-section {
+      margin-bottom: 30px;
+    }
+
+    .floor-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    @media (max-width: 768px) {
+      .control-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+
+  <script>
+    // Sensor configurations with safe limits
+    const SENSOR_TYPES = {
+      gas: {
+        name: 'Gas Sensor',
+        icon: '💨',
+        unit: 'ppm',
+        safeLimit: 50,
+        dangerLimit: 100
+      },
+      smoke: {
+        name: 'Smoke Detector',
+        icon: '🔥',
+        unit: 'ppm',
+        safeLimit: 30,
+        dangerLimit: 60
+      },
+      fire: {
+        name: 'Fire Detector',
+        icon: '🔴',
+        unit: '°C',
+        safeLimit: 50,
+        dangerLimit: 80
+      },
+      temperature: {
+        name: 'Temperature',
+        icon: '🌡️',
+        unit: '°C',
+        safeLimit: 45,
+        dangerLimit: 60
+      },
+      waterLeak: {
+        name: 'Water Leak',
+        icon: '💧',
+        unit: 'Level',
+        safeLimit: 2,
+        dangerLimit: 5
+      },
+      motion: {
+        name: 'Motion Detector',
+        icon: '👤',
+        unit: 'Activity',
+        safeLimit: 50,
+        dangerLimit: 100
+      }
+    };
+
+    // Initialize apartment data
+    const apartments = [];
+    for (let floor = 1; floor <= 8; floor++) {
+      for (let flat = 1; flat <= 4; flat++) {
+        const flatNumber = `${floor}0${flat}`;
+        apartments.push({
+          floor,
+          flat: flatNumber,
+          sensors: generateSensors(flatNumber)
+        });
+      }
+    }
+
+    function generateSensors(flatNumber) {
+      return Object.keys(SENSOR_TYPES).map(type => ({
+        id: `${flatNumber}-${type}`,
+        type,
+        value: Math.random() * SENSOR_TYPES[type].safeLimit * 0.8,
+        flatNumber
+      }));
+    }
+
+    // Application state
+    let currentView = 'login';
+    let currentUser = null;
+    let currentFlat = null;
+    let alerts = [];
+    let showBuzzer = false;
+    let loginError = '';
+    let showFlatForm = false;
+    let showControlForm = false;
+    let buzzerInterval = null;
+    let alertTriggeredForSession = false; // Track if alert was triggered for current session
+    let selectedFlatInControl = null; // Track which flat is selected in control room view
+
+    // Passwords
+    const FLAT_PASSWORD = 'flat123';
+    const CONTROL_PASSWORD = 'ControlRoom@2025';
+
+    // Create buzzer audio element
+    function createBuzzerSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'square';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      
+      oscillator.start();
+      
+      setTimeout(() => {
+        oscillator.stop();
+      }, 200);
+      
+      setTimeout(() => {
+        const osc2 = audioContext.createOscillator();
+        const gain2 = audioContext.createGain();
+        osc2.connect(gain2);
+        gain2.connect(audioContext.destination);
+        osc2.frequency.value = 800;
+        osc2.type = 'square';
+        gain2.gain.setValueAtTime(0.3, audioContext.currentTime);
+        osc2.start();
+        setTimeout(() => osc2.stop(), 200);
+      }, 300);
+    }
+
+    function startBuzzerLoop() {
+      if (buzzerInterval) return; // Already running
+      
+      // Play immediately
+      createBuzzerSound();
+      
+      // Then loop every 1 second
+      buzzerInterval = setInterval(() => {
+        createBuzzerSound();
+      }, 1000);
+    }
+
+    function stopBuzzerLoop() {
+      if (buzzerInterval) {
+        clearInterval(buzzerInterval);
+        buzzerInterval = null;
+      }
+    }
+
+    // Simulate sensor readings
+    let sessionStartTime = 0;
+    
+    setInterval(() => {
+      // Don't update during login
+      if (currentView === 'login') {
+        return;
+      }
+      
+      // Automatically trigger one alert 5 seconds after login
+      const timeSinceLogin = Date.now() - sessionStartTime;
+      if (!alertTriggeredForSession && timeSinceLogin > 5000) {
+        // Pick a random apartment and random sensor
+        const randomApt = apartments[Math.floor(Math.random() * apartments.length)];
+        const randomSensor = randomApt.sensors[Math.floor(Math.random() * randomApt.sensors.length)];
+        const config = SENSOR_TYPES[randomSensor.type];
+        
+        // Set sensor to danger level
+        randomSensor.value = config.dangerLimit + Math.random() * 30;
+        alertTriggeredForSession = true;
+      }
+      
+      apartments.forEach(apt => {
+        apt.sensors.forEach(sensor => {
+          const config = SENSOR_TYPES[sensor.type];
+          
+          // Normal operation - sensors fluctuate within safe range
+          if (sensor.value <= config.dangerLimit) {
+            // Gradual random fluctuation
+            const change = (Math.random() - 0.5) * 5;
+            sensor.value = Math.max(0, Math.min(sensor.value + change, config.safeLimit * 0.9));
+          } else {
+            // If sensor is in danger, slowly decrease it back to normal
+            sensor.value = Math.max(config.safeLimit * 0.8, sensor.value - 5);
+          }
+
+          // Check for danger
+          if (sensor.value > config.dangerLimit) {
+            const existingAlert = alerts.find(a => a.sensorId === sensor.id);
+            if (!existingAlert) {
+              alerts.push({
+                id: Date.now(),
+                sensorId: sensor.id,
+                flatNumber: sensor.flatNumber,
+                sensorName: config.name,
+                value: sensor.value.toFixed(1),
+                unit: config.unit,
+                time: new Date().toLocaleTimeString()
+              });
+              if (currentUser && 
+                  (currentUser.role === 'control' || currentFlat === sensor.flatNumber)) {
+                showNotification(sensor, config);
+                showBuzzer = true;
+                startBuzzerLoop(); // Start continuous buzzer
+              }
+            }
+          } else {
+            // Remove alert if sensor returns to safe levels
+            const wasRemoved = alerts.some(a => a.sensorId === sensor.id);
+            alerts = alerts.filter(a => a.sensorId !== sensor.id);
+            
+            // Stop buzzer if this was the last alert
+            if (wasRemoved && alerts.length === 0) {
+              showBuzzer = false;
+              stopBuzzerLoop();
+            }
+          }
+        });
+      });
+      render();
+    }, 2000);
+
+    function showNotification(sensor, config) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.innerHTML = `
+        <div class="notification-header">
+          🚨 DANGER ALERT!
+        </div>
+        <div class="notification-body">
+          <strong>Flat ${sensor.flatNumber}</strong><br>
+          ${config.name}: ${sensor.value.toFixed(1)} ${config.unit}<br>
+          Safe limit: ${config.dangerLimit} ${config.unit}
+        </div>
+      `;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => notification.remove(), 5000);
+    }
+
+    function showFlatLogin() {
+      showFlatForm = true;
+      showControlForm = false;
+      loginError = '';
+      render();
+    }
+
+    function showControlLogin() {
+      showFlatForm = false;
+      showControlForm = true;
+      loginError = '';
+      render();
+    }
+
+    function attemptLogin(role, password, flat = null) {
+      loginError = '';
+      
+      if (role === 'flat') {
+        if (!flat) {
+          loginError = 'Please select a flat number';
+          render();
+          return;
+        }
+        if (password !== FLAT_PASSWORD) {
+          loginError = 'Incorrect password for Flat Owner access';
+          render();
+          return;
+        }
+      } else if (role === 'control') {
+        if (password !== CONTROL_PASSWORD) {
+          loginError = 'Incorrect password for Control Room access';
+          render();
+          return;
+        }
+      }
+      
+      // Successful login
+      currentUser = { role };
+      currentFlat = flat;
+      currentView = role === 'flat' ? 'flat-owner' : 'control-room';
+      loginError = '';
+      showFlatForm = false;
+      showControlForm = false;
+      
+      // Reset alert system for new session
+      alertTriggeredForSession = false;
+      sessionStartTime = Date.now();
+      
+      render();
+    }
+
+    function logout() {
+      currentUser = null;
+      currentFlat = null;
+      currentView = 'login';
+      alerts = [];
+      showBuzzer = false;
+      loginError = '';
+      showFlatForm = false;
+      showControlForm = false;
+      selectedFlatInControl = null; // Reset selected flat
+      stopBuzzerLoop(); // Stop buzzer on logout
+      render();
+    }
+
+    function viewFlatDetails(flatNumber) {
+      selectedFlatInControl = flatNumber;
+      render();
+    }
+
+    function backToControlOverview() {
+      selectedFlatInControl = null;
+      render();
+    }
+
+    function dismissBuzzer() {
+      showBuzzer = false;
+      stopBuzzerLoop(); // Stop continuous buzzer
+      render();
+    }
+
+    function renderLogin() {
+      return `
+        <div class="login-container">
+          <h2>🏢 Disaster Alert System</h2>
+          <h3 style="text-align: center; color: #666; margin-bottom: 30px;">Smart Apartment Safety</h3>
+          <div class="login-options">
+            <button class="login-btn flat-owner" onclick="showFlatLogin()">
+              <span>🏠 Flat Owner Login</span>
+              <span>→</span>
+            </button>
+            <button class="login-btn control-room" onclick="showControlLogin()">
+              <span>🎛️ Control Room Access</span>
+              <span>→</span>
+            </button>
+          </div>
+          
+          ${showFlatForm ? `
+          <div class="flat-selector">
+            <label>Select Your Flat:</label>
+            <select id="flat-dropdown">
+              <option value="">-- Choose Flat --</option>
+              ${apartments.map(apt => `
+                <option value="${apt.flat}">Floor ${apt.floor} - Flat ${apt.flat}</option>
+              `).join('')}
+            </select>
+            <label>Enter Password:</label>
+            <input type="password" id="flat-password" placeholder="Flat owner password">
+            <button onclick="attemptLogin('flat', document.getElementById('flat-password').value, document.getElementById('flat-dropdown').value)">
+              Login
+            </button>
+            ${loginError ? `<div class="error-message">${loginError}</div>` : ''}
+            <p style="margin-top: 15px; font-size: 12px; color: #666; text-align: center;">
+              Demo Password: flat123
+            </p>
+          </div>
+          ` : ''}
+
+          ${showControlForm ? `
+          <div class="flat-selector">
+            <label>Control Room Password:</label>
+            <input type="password" id="control-password" placeholder="Enter control room password">
+            <button onclick="attemptLogin('control', document.getElementById('control-password').value)">
+              Access Control Room
+            </button>
+            ${loginError ? `<div class="error-message">${loginError}</div>` : ''}
+            <p style="margin-top: 15px; font-size: 12px; color: #666; text-align: center;">
+              Demo Password: ControlRoom@2025
+            </p>
+          </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    function renderFlatOwner() {
+      const apartment = apartments.find(apt => apt.flat === currentFlat);
+      if (!apartment) return '';
+
+      return `
+        <div class="container">
+          <div class="header">
+            <h1>
+              <span class="header-icon">🏠</span>
+              Flat ${currentFlat} Sensor Dashboard
+            </h1>
+            <div>
+              <div class="user-info">
+                <div class="name" style="font-size: 24px; margin-bottom: 5px;">Flat ${currentFlat}</div>
+                <div class="role">Floor ${apartment.floor}</div>
+              </div>
+              <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+          </div>
+          <div class="dashboard">
+            ${apartment.sensors.map(sensor => renderSensorCard(sensor)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSensorCard(sensor) {
+      const config = SENSOR_TYPES[sensor.type];
+      const isDanger = sensor.value > config.dangerLimit;
+      const percentage = Math.min((sensor.value / config.dangerLimit) * 100, 100);
+
+      return `
+        <div class="sensor-card ${isDanger ? 'alert' : ''}">
+          <div class="sensor-header">
+            <span class="sensor-icon">${config.icon}</span>
+            <span class="sensor-status ${isDanger ? 'danger' : 'safe'}">
+              ${isDanger ? '⚠️' : '✓'}
+            </span>
+          </div>
+          <div class="sensor-name">${config.name}</div>
+          <div class="sensor-reading ${isDanger ? 'danger' : ''}">
+            ${sensor.value.toFixed(1)} ${config.unit}
+          </div>
+          <div class="sensor-limit">
+            <strong>Safe Limit:</strong> ≤ ${config.dangerLimit} ${config.unit}
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill ${isDanger ? 'danger' : 'safe'}" 
+                 style="width: ${percentage}%"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderControlRoom() {
+      const dangerousFlats = new Set(alerts.map(a => a.flatNumber));
+      
+      // If a flat is selected, show its detailed view
+      if (selectedFlatInControl) {
+        const apartment = apartments.find(apt => apt.flat === selectedFlatInControl);
+        if (!apartment) {
+          selectedFlatInControl = null;
+          return renderControlRoom();
+        }
+        
+        return `
+          <div class="container">
+            <div class="header">
+              <h1>
+                <span class="header-icon">🎛️</span>
+                Control Room - Flat ${selectedFlatInControl} Details
+              </h1>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <button style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;" onclick="backToControlOverview()">
+                  ← Back to Overview
+                </button>
+                <div>
+                  <div class="user-info">
+                    <div class="name" style="font-size: 20px; margin-bottom: 5px;">Flat ${selectedFlatInControl}</div>
+                    <div class="role">Floor ${apartment.floor}</div>
+                  </div>
+                  <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+              </div>
+            </div>
+            <div class="dashboard">
+              ${apartment.sensors.map(sensor => renderSensorCard(sensor)).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      // Otherwise show the overview
+      return `
+        <div class="container">
+          <div class="header">
+            <h1>
+              <span class="header-icon">🎛️</span>
+              Control Room Dashboard
+            </h1>
+            <div>
+              <div class="user-info">
+                <div class="role">Control Room</div>
+                <div class="name">Master Control</div>
+              </div>
+              <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+          </div>
+
+          ${alerts.length > 0 ? `
+            <div class="alert-panel">
+              <h2>🚨 Active Alerts (${alerts.length})</h2>
+              ${alerts.slice(-5).reverse().map(alert => `
+                <div class="alert-item">
+                  <div>
+                    <strong>Flat ${alert.flatNumber}</strong> - ${alert.sensorName}: 
+                    ${alert.value} ${alert.unit}
+                  </div>
+                  <div class="time">${alert.time}</div>
+                </div>
+              `).join('')}
+            </div>
+          ` : ''}
+
+          ${[8,7,6,5,4,3,2,1].map(floor => `
+            <div class="floor-section">
+              <div class="floor-header">Floor ${floor}</div>
+              <div class="control-grid">
+                ${apartments
+                  .filter(apt => apt.floor === floor)
+                  .map(apt => {
+                    const hasAlert = dangerousFlats.has(apt.flat);
+                    return `
+                      <div class="flat-card ${hasAlert ? 'alert' : ''}" onclick="viewFlatDetails('${apt.flat}')">
+                        <div class="flat-number">${apt.flat}</div>
+                        <div class="flat-status ${hasAlert ? 'danger' : 'safe'}">
+                          ${hasAlert ? '🚨 ALERT' : '✓ Safe'}
+                        </div>
+                        <p style="font-size: 12px; color: #666; margin-top: 8px;">Click to view sensors</p>
+                      </div>
+                    `;
+                  }).join('')}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function render() {
+      const app = document.getElementById('app');
+      
+      let html = '';
+      if (currentView === 'login') {
+        html = renderLogin();
+      } else if (currentView === 'flat-owner') {
+        html = renderFlatOwner();
+      } else if (currentView === 'control-room') {
+        html = renderControlRoom();
+      }
+
+      if (showBuzzer && currentUser) {
+        const latestAlert = alerts[alerts.length - 1];
+        html += `
+          <div class="buzzer">
+            <div class="buzzer-icon">🚨</div>
+            <h2>DANGER ALERT!</h2>
+            <p>
+              <strong>Flat ${latestAlert.flatNumber}</strong><br>
+              ${latestAlert.sensorName}<br>
+              ${latestAlert.value} ${latestAlert.unit}
+            </p>
+            <button onclick="dismissBuzzer()">Acknowledge</button>
+          </div>
+        `;
+      }
+
+      app.innerHTML = html;
+    }
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
